@@ -10,7 +10,7 @@ public class ConfigurationForSetCovering implements AntSystemConfigurationProvid
 
     @Override
     public int getNumberOfAnts() {
-        return 5;
+        return 50;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class ConfigurationForSetCovering implements AntSystemConfigurationProvid
 
     @Override
     public int getNumberOfIterations() {
-        return 30;
+        return 10;
     }
 
     @Override

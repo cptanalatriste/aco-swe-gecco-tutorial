@@ -6,10 +6,9 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String... args) throws ConfigurationException, IOException {
-        System.out.println("Holitas");
 
         AcoSetCovering solver = new AcoSetCovering();
-        String problemData = "data/AC_10_cover.txt";
+        String problemData = "data/AC_01_cover.txt";
         solver.solve(problemData);
     }
 }
