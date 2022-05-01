@@ -81,7 +81,7 @@ public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
         return environment.getSamplesPerCandidate().keySet()
                 .stream()
                 .filter(candidateIndex -> !isNodeVisited(candidateIndex))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
