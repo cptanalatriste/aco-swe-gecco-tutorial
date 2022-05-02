@@ -13,13 +13,13 @@ public class AntColonyForSetCovering extends AntColony<Integer, EnvironmentForSe
 
     @Override
     protected Ant<Integer, EnvironmentForSetCovering> createAnt(EnvironmentForSetCovering environment) {
-        Set<Integer> allCandidates = environment.getSamplesPerCandidate().keySet();
-        Optional<Integer> startingPoint = allCandidates.stream()
-                .skip((int) (allCandidates.size() * Math.random()))
+        Set<Integer> allSets = environment.getElementsPerSet().keySet();
+        Optional<Integer> initialSet = allSets.stream()
+                .skip((int) (allSets.size() * Math.random()))
                 .findFirst();
 
-        return startingPoint
-                .map(integer -> new AntForSetCovering(environment, integer))
+        return initialSet
+                .map(setId -> new AntForSetCovering(environment, setId))
                 .orElse(null);
 
     }

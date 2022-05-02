@@ -11,17 +11,17 @@ import java.util.stream.IntStream;
 public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
 
     private final EnvironmentForSetCovering environment;
-    private final Integer startingPoint;
+    private final Integer initialSet;
 
-    private boolean[] samplesCovered;
+    private boolean[] elementsCovered;
 
 
-    public AntForSetCovering(EnvironmentForSetCovering environment, Integer startingPoint) {
+    public AntForSetCovering(EnvironmentForSetCovering environment, Integer initialSet) {
         super();
         this.environment = environment;
-        this.startingPoint = startingPoint;
+        this.initialSet = initialSet;
 
-        this.samplesCovered = new boolean[environment.getNumberOfSamples()];
+        this.elementsCovered = new boolean[environment.getNumberOfElements()];
 
         this.setSolution(new ArrayList<>());
 
@@ -29,23 +29,23 @@ public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
 
     @Override
     public void clear() {
-        this.samplesCovered = new boolean[environment.getNumberOfSamples()];
+        this.elementsCovered = new boolean[environment.getNumberOfElements()];
         super.clear();
-        this.visitNode(startingPoint, environment);
+        this.visitNode(initialSet, environment);
     }
 
     @Override
-    public void visitNode(Integer candidateIndex, EnvironmentForSetCovering environment) {
-        super.visitNode(candidateIndex, environment);
-        Set<Integer> candidateSamples = environment.getSamplesPerCandidate().get(candidateIndex);
-        candidateSamples.forEach((sampleIndex) -> this.samplesCovered[sampleIndex] = true);
+    public void visitNode(Integer setId, EnvironmentForSetCovering environment) {
+        super.visitNode(setId, environment);
+        Set<Integer> elementsInSet = environment.getElementsPerSet().get(setId);
+        elementsInSet.forEach((elementId) -> this.elementsCovered[elementId] = true);
     }
 
     @Override
     public boolean isSolutionReady(EnvironmentForSetCovering environmentForSetCovering) {
-        Set<Integer> uncoveredSamples = this.getUncoveredSamples();
-        int pendingSamples = uncoveredSamples.size();
-        return pendingSamples == 0;
+        Set<Integer> uncoveredElements = this.getUncoveredElements();
+        int pendingElements = uncoveredElements.size();
+        return pendingElements == 0;
     }
 
     @Override
@@ -54,23 +54,23 @@ public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
     }
 
     @Override
-    public Double getHeuristicValue(Integer candidateIndex, Integer positionInSolution,
+    public Double getHeuristicValue(Integer setId, Integer positionInSolution,
                                     EnvironmentForSetCovering environment) {
-        Set<Integer> uncoveredSamples = this.getUncoveredSamples();
-        Set<Integer> coveredByCandidate = environment.getSamplesForCandidate(candidateIndex);
+        Set<Integer> uncoveredElements = this.getUncoveredElements();
+        Set<Integer> coveredBySet = environment.getElementsCovered(setId);
 
-        Set<Integer> commonElements = uncoveredSamples
+        Set<Integer> commonElements = uncoveredElements
                 .stream()
                 .unordered()
-                .filter(coveredByCandidate::contains)
+                .filter(coveredBySet::contains)
                 .collect(Collectors.toSet());
 
-        return commonElements.size() / (double) this.environment.getNumberOfSamples();
+        return commonElements.size() / (double) this.environment.getNumberOfElements();
     }
 
-    private Set<Integer> getUncoveredSamples() {
-        return IntStream.range(0, this.environment.getNumberOfSamples())
-                .filter(sampleIndex -> !this.samplesCovered[sampleIndex])
+    private Set<Integer> getUncoveredElements() {
+        return IntStream.range(0, this.environment.getNumberOfElements())
+                .filter(elementId -> !this.elementsCovered[elementId])
                 .boxed()
                 .collect(Collectors.toUnmodifiableSet());
     }
@@ -78,25 +78,25 @@ public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
     @Override
     public List<Integer> getNeighbourhood(EnvironmentForSetCovering environment) {
 
-        return environment.getSamplesPerCandidate().keySet()
+        return environment.getElementsPerSet().keySet()
                 .stream()
-                .filter(candidateIndex -> !isNodeVisited(candidateIndex))
+                .filter(setId -> !isNodeVisited(setId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Double getPheromoneTrailValue(Integer solutionComponent, Integer positionInSolution,
+    public Double getPheromoneTrailValue(Integer setId, Integer positionInSolution,
                                          EnvironmentForSetCovering environment) {
 
         double[][] pheromoneMatrix = environment.getPheromoneMatrix();
-        return pheromoneMatrix[solutionComponent][0];
+        return pheromoneMatrix[setId][0];
     }
 
     @Override
-    public void setPheromoneTrailValue(Integer solutionComponent, Integer positionInSolution, EnvironmentForSetCovering
+    public void setPheromoneTrailValue(Integer setId, Integer positionInSolution, EnvironmentForSetCovering
             environment, Double value) {
         double[][] pheromoneMatrix = environment.getPheromoneMatrix();
-        pheromoneMatrix[solutionComponent][0] = value;
+        pheromoneMatrix[setId][0] = value;
 
     }
 }

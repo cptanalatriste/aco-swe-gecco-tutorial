@@ -13,11 +13,11 @@ public class EnvironmentForSetCovering extends Environment {
 
     private static final int UNASSIGNED = -1;
 
-    private int numberOfCandidates;
-    private int numberOfSamples;
+    private int numberOfSets;
+    private int numberOfElements;
 
 
-    private final Map<Integer, Set<Integer>> samplesPerCandidate = new HashMap<>();
+    private final Map<Integer, Set<Integer>> elementsPerSet = new HashMap<>();
 
     public EnvironmentForSetCovering(String fileName) throws IOException {
         super();
@@ -28,57 +28,57 @@ public class EnvironmentForSetCovering extends Environment {
 
     @Override
     protected double[][] createPheromoneMatrix() {
-        if (this.numberOfCandidates != 0) {
-            return new double[this.numberOfCandidates][1];
+        if (this.numberOfSets != 0) {
+            return new double[this.numberOfSets][1];
         }
 
         return null;
     }
 
-    public Set<Integer> getSamplesForCandidate(Integer candidateIndex) {
-        return this.samplesPerCandidate.get(candidateIndex);
+    public Set<Integer> getElementsCovered(Integer setId) {
+        return this.elementsPerSet.get(setId);
     }
 
-    public Integer getNumberOfSamples() {
-        return this.numberOfSamples;
+    public Integer getNumberOfElements() {
+        return this.numberOfElements;
     }
 
-    public Map<Integer, Set<Integer>> getSamplesPerCandidate() {
-        return samplesPerCandidate;
+    public Map<Integer, Set<Integer>> getElementsPerSet() {
+        return elementsPerSet;
     }
 
     private void processDataFile(String fileName) throws IOException {
         int lineCounter = 0;
-        int sampleIndex = UNASSIGNED;
-        int candidatesForSample = UNASSIGNED;
+        int elementId = UNASSIGNED;
+        int setsForElement = UNASSIGNED;
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(" ");
 
                 if (lineCounter == 0) {
-                    this.numberOfSamples = Integer.parseInt(tokens[0]);
-                    this.numberOfCandidates = Integer.parseInt(tokens[1]);
-                    IntStream.range(0, numberOfCandidates)
-                            .forEachOrdered((candidateIndex) -> samplesPerCandidate.put(
-                                    candidateIndex, new HashSet<>()));
+                    this.numberOfElements = Integer.parseInt(tokens[0]);
+                    this.numberOfSets = Integer.parseInt(tokens[1]);
+                    IntStream.range(0, numberOfSets)
+                            .forEachOrdered((setId) -> elementsPerSet.put(
+                                    setId, new HashSet<>()));
 
-                } else if (sampleIndex == UNASSIGNED && tokens.length == 1) {
-                    sampleIndex = Integer.parseInt(tokens[0]);
-                } else if (sampleIndex != UNASSIGNED && candidatesForSample == UNASSIGNED && tokens.length == 1) {
-                    candidatesForSample = Integer.parseInt(tokens[0]);
-                } else if (sampleIndex != UNASSIGNED && candidatesForSample != UNASSIGNED) {
+                } else if (elementId == UNASSIGNED && tokens.length == 1) {
+                    elementId = Integer.parseInt(tokens[0]);
+                } else if (elementId != UNASSIGNED && setsForElement == UNASSIGNED && tokens.length == 1) {
+                    setsForElement = Integer.parseInt(tokens[0]);
+                } else if (elementId != UNASSIGNED && setsForElement != UNASSIGNED) {
 
-                    Set<Integer> candidateList = Arrays.stream(tokens)
+                    Set<Integer> setList = Arrays.stream(tokens)
                             .map(Integer::parseInt)
                             .collect(Collectors.toUnmodifiableSet());
-                    int finalSampleIndex = sampleIndex;
-                    candidateList.stream()
+                    int finalElementId = elementId;
+                    setList.stream()
                             .unordered()
-                            .forEach((candidateIndex) -> samplesPerCandidate.get(candidateIndex).add(finalSampleIndex));
+                            .forEach((setId) -> elementsPerSet.get(setId).add(finalElementId));
 
-                    sampleIndex = UNASSIGNED;
-                    candidatesForSample = UNASSIGNED;
+                    elementId = UNASSIGNED;
+                    setsForElement = UNASSIGNED;
                 }
                 lineCounter += 1;
             }
