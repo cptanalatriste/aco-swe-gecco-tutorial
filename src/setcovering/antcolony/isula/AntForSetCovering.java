@@ -38,7 +38,7 @@ public class AntForSetCovering extends Ant<Integer, EnvironmentForSetCovering> {
     public void visitNode(Integer setId, EnvironmentForSetCovering environment) {
         super.visitNode(setId, environment);
         Set<Integer> elementsInSet = environment.getElementsPerSet().get(setId);
-        elementsInSet.forEach((elementId) -> this.elementsCovered[elementId] = true);
+        elementsInSet.forEach(elementId -> this.elementsCovered[elementId] = true);
     }
 
     @Override

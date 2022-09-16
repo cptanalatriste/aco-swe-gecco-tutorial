@@ -32,7 +32,7 @@ public class EnvironmentForSetCovering extends Environment {
             return new double[this.numberOfSets][1];
         }
 
-        return null;
+        return new double[0][0];
     }
 
     public Set<Integer> getElementsCovered(Integer setId) {
@@ -60,7 +60,7 @@ public class EnvironmentForSetCovering extends Environment {
                     this.numberOfElements = Integer.parseInt(tokens[0]);
                     this.numberOfSets = Integer.parseInt(tokens[1]);
                     IntStream.range(0, numberOfSets)
-                            .forEachOrdered((setId) -> elementsPerSet.put(
+                            .forEachOrdered(setId -> elementsPerSet.put(
                                     setId, new HashSet<>()));
 
                 } else if (elementId == UNASSIGNED && tokens.length == 1) {
@@ -75,7 +75,7 @@ public class EnvironmentForSetCovering extends Environment {
                     int finalElementId = elementId;
                     setList.stream()
                             .unordered()
-                            .forEach((setId) -> elementsPerSet.get(setId).add(finalElementId));
+                            .forEach(setId -> elementsPerSet.get(setId).add(finalElementId));
 
                     elementId = UNASSIGNED;
                     setsForElement = UNASSIGNED;
